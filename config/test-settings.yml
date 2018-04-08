@@ -6,6 +6,6 @@ database:
   # something like:
   #
   #   database: "_env:PGDATABASE:hello-yesod-rest_test"
-  database: hello-yesod-rest_test
+  database: hello_yesod_test
 
 auth-dummy-login: true

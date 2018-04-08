@@ -3,9 +3,9 @@
 After installing Postgres, run:
 
 ```
-createuser hello-yesod-rest --password hello-yesod-rest --superuser
-createdb hello-yesod-rest
-createdb hello-yesod-rest_test
+createuser hello_yesod --password hello_yesod --superuser
+createdb hello_yesod
+createdb hello_yesod_test
 ```
 
 ## Haskell Setup

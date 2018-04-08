@@ -8,11 +8,15 @@ module TestImport
 
 import Application           (makeFoundation, makeLogWare)
 import ClassyPrelude         as X hiding (delete, deleteBy, Handler)
+import Data.Aeson            (ToJSON, FromJSON, fromJSON, decode, Result (..))
+import qualified Data.ByteString.Lazy.Char8 as L8
 import Database.Persist      as X hiding (get)
 import Database.Persist.Sql  (SqlPersistM, runSqlPersistMPool, rawExecute, rawSql, unSingle, connEscapeName)
 import Foundation            as X
 import Model                 as X
+import Network.Wai.Test      (SResponse (..))
 import Test.Hspec            as X
+import Test.Hspec            (Expectation, expectationFailure)
 import Text.Shakespeare.Text (st)
 import Yesod.Default.Config2 (useEnv, loadYamlSettings)
 import Yesod.Auth            as X
@@ -66,17 +70,19 @@ getTables = do
 
     return $ map unSingle tables
 
--- | Create a user.  The dummy email entry helps to confirm that foreign-key
--- checking is switched off in wipeDB for those database backends which need it.
-createUser :: Text -> YesodExample App (Entity User)
-createUser ident = runDB $ do
-    user <- insertEntity User
-        { userIdent = ident
-        , userPassword = Nothing
-        }
-    _ <- insert Email
-        { emailEmail = ident
-        , emailUserId = Just $ entityKey user
-        , emailVerkey = Nothing
-        }
-    return user
+assertJson :: (ToJSON a, FromJSON a)
+    => (a -> Expectation)
+    -> SResponse
+    -> YesodExample App ()
+assertJson assertion SResponse{simpleBody = lbs} = liftIO $
+    case decode lbs of
+        Nothing -> expectationFailure $ "Invalid JSON: "  ++ show (L8.unpack lbs)
+        Just a ->
+            case fromJSON a of
+                Error s -> expectationFailure $ concat [s, "\nInput JSON: ", show a]
+                Success x -> assertion x
+
+expectResponseJson :: (ToJSON a, FromJSON a)
+    => (a -> Expectation)
+    -> YesodExample App ()
+expectResponseJson assertion = withResponse (assertJson assertion)

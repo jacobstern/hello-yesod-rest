@@ -9,9 +9,6 @@ spec :: Spec
 spec = withApp $ do
     describe "valid request" $ do
         it "gives a 200" $ do
-            get HomeR
-            statusIs 200
-
             let message = "My message" :: Text
                 body = object [ "message" .= message ]
                 encoded = encode body
@@ -29,8 +26,6 @@ spec = withApp $ do
 
     describe "invalid requests" $ do
         it "400s when the JSON body is invalid" $ do
-            get HomeR
-
             let body = object [ "foo" .= ("My message" :: Value) ]
 
             request $ do

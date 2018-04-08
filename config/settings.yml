@@ -36,6 +36,3 @@ database:
   # See config/test-settings.yml for an override during tests
   database: "_env:PGDATABASE:hello_yesod"
   poolsize: "_env:PGPOOLSIZE:10"
-
-copyright: Insert copyright statement here
-#analytics: UA-YOURCODE

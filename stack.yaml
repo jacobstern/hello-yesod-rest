@@ -64,3 +64,11 @@ packages:
 #
 # Allow a newer minor version of GHC than the snapshot specifies
 # compiler-check: newer-minor
+
+# Fixes a linker error with HIE on Ubuntu
+# https://github.com/haskell/haskell-ide-engine/issues/406
+apply-ghc-options: everything
+ghc-options:
+  "yaml": -opta-Wa,-mrelax-relocations=no
+  "cipher-aes": -opta-Wa,-mrelax-relocations=no
+  "skein": -opta-Wa,-mrelax-relocations=no
